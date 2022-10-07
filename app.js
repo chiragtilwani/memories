@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const HttpError= require('./models/http-error')
 const placesRouter= require('./routes/places-routes')
+const usersRouter= require('./routes/users-routes')
 
 //for parsing encoded data like data of form
 // app.use(bodyParser.urlencoded({extended:false}))
@@ -10,6 +11,7 @@ app.use(bodyParser.json())
 
 //for sending request to routes starting with /api/places/... 
 app.use('/api/places',placesRouter)
+app.use('/api/users',usersRouter)
 
 //handling error for route not found
 app.use((req, res, next) => {
