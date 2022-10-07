@@ -9,4 +9,6 @@ router.get('/user/:uid',placesController.getPlaceByUserId)
 
 router.post('/',placesController.createPlace)
 
+router.patch('/:pid',placesController.updatePlace)
+
 module.exports = router

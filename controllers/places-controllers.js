@@ -1,6 +1,8 @@
-const HttpError=require('../models/http-error')
+const { v4: uuidv4 } = require('uuid');
 
-const dummyPlace = [
+const HttpError = require('../models/http-error')
+
+let dummyPlace = [
     {
         id: 'p1', name: 'Mysore Palace', postedBy: 'chirag', description: 'Indo-Saracenic palace, completed in 1912, with a grand durbar hall and weekly illuminations.', address: 'Sayyaji Rao Rd, Agrahara, Chamrajpura, Mysuru, Karnataka 570001', url: "https://lh5.googleusercontent.com/p/AF1QipOxM9k1RkWMiEPLGKjZFhMXu6YSkenS0KtlyZLn=w408-h306-k-no", liked: false, n_likes: 0, location: {
             lng: 12.3051682,
@@ -9,33 +11,53 @@ const dummyPlace = [
     }
 ]
 
-const getPlaceById=(req,res,next)=>{
-    const {pid} = req.params;
-    const foundPlace=dummyPlace.find(p=>p.id===pid);
+const getPlaceById = (req, res, next) => {
+    const { pid } = req.params;
+    const foundPlace = dummyPlace.find(p => p.id === pid);
     //triggering error handling middleware using Error Model-HttpError()
-    if(!foundPlace){
-        return next(new HttpError('Could not find the place with provided pid.',404))
+    if (!foundPlace) {
+        return next(new HttpError('Could not find the place with provided pid.', 404))
     }
     res.json(foundPlace)
 }
 
-const getPlaceByUserId=(req,res,next)=>{
-    const {uid} = req.params;
-    const foundPlace=dummyPlace.find(p=>p.creatorID===uid);
+const getPlaceByUserId = (req, res, next) => {
+    const { uid } = req.params;
+    const foundPlace = dummyPlace.find(p => p.creatorID === uid);
     //triggering error handling middleware using Error Model-HttpError()
-    if(!foundPlace){
-        return next(new HttpError('Could not find the place with provided pid.',404))
+    if (!foundPlace) {
+        return next(new HttpError('Could not find the place with provided pid.', 404))
     }
     res.json(foundPlace)
 }
 
-const createPlace =(req,res,next)=>{
-    const {id,name,description,address,url,liked,n_likes,location,creatorID,postDate} = req.body
-    const createdPlace={id,name,description,address,url,liked,n_likes,location,creatorID,postDate}
+const createPlace = (req, res, next) => {
+    const date=new Date() 
+    const day =date.getDate()
+    const month =date.getMonth()+1
+    const year =date.getFullYear()
+    console.log()
+    const { name, description, address, url, location, creatorID } = req.body
+    const createdPlace = { id:uuidv4(), name, description, address, url, liked:false, n_likes:0, location, creatorID, postDate:`${day}-${month}-${year}` }
     dummyPlace.push(createdPlace)
     res.status(201).json(dummyPlace)
 }
 
-exports.getPlaceById=getPlaceById
-exports.getPlaceByUserId=getPlaceByUserId
-exports.createPlace=createPlace
+const updatePlace = (req, res, next) => {
+    const { pid } = req.params;
+    const { name, description, address, url, location } = req.body
+    const updatedPlace = { name, description, address, url, location }
+    dummyPlace = dummyPlace.map(p => {
+        if (p.id === pid) {
+            return { ...p, ...updatedPlace }
+        } else {
+            return p
+        }
+    })
+    res.status(200).json({ place: updatedPlace, dummyPlace: dummyPlace })
+}
+
+exports.getPlaceById = getPlaceById
+exports.getPlaceByUserId = getPlaceByUserId
+exports.createPlace = createPlace
+exports.updatePlace = updatePlace
