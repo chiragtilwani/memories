@@ -5,7 +5,8 @@ const bodyParser = require('body-parser');
 const placesRouter= require('./routes/places-routes')
 
 //for parsing encoded data like data of form
-app.use(bodyParser.urlencoded({extended:false}))
+// app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.json())
 
 //for sending request to routes starting with /api/places/... 
 app.use('/api/places',placesRouter)

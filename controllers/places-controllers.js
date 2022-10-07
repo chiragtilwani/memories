@@ -29,5 +29,13 @@ const getPlaceByUserId=(req,res,next)=>{
     res.json(foundPlace)
 }
 
+const createPlace =(req,res,next)=>{
+    const {id,name,description,address,url,liked,n_likes,location,creatorID,postDate} = req.body
+    const createdPlace={id,name,description,address,url,liked,n_likes,location,creatorID,postDate}
+    dummyPlace.push(createdPlace)
+    res.status(201).json(dummyPlace)
+}
+
 exports.getPlaceById=getPlaceById
 exports.getPlaceByUserId=getPlaceByUserId
+exports.createPlace=createPlace
