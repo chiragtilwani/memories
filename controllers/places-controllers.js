@@ -21,14 +21,14 @@ const getPlaceById = (req, res, next) => {
     res.json(foundPlace)
 }
 
-const getPlaceByUserId = (req, res, next) => {
+const getPlacesByUserId = (req, res, next) => {
     const { uid } = req.params;
-    const foundPlace = dummyPlace.find(p => p.creatorID === uid);
+    const foundPlaces = dummyPlace.filter(p => p.creatorID === uid);
     //triggering error handling middleware using Error Model-HttpError()
-    if (!foundPlace) {
-        return next(new HttpError('Could not find the place with provided pid.', 404))
+    if (!foundPlaces || foundPlaces.length === 0) {
+        return next(new HttpError('Could not find the places with provided pid.', 404))
     }
-    res.json(foundPlace)
+    res.json(foundPlaces)
 }
 
 const createPlace = (req, res, next) => {
@@ -57,7 +57,14 @@ const updatePlace = (req, res, next) => {
     res.status(200).json({ place: updatedPlace, dummyPlace: dummyPlace })
 }
 
+const deletePlace= (req, res, next) => {
+    const {pid} =req.params
+    dummyPlace=dummyPlace.filter(p => p.id !== pid)
+    res.status(200).json({message:"places Deleted"})
+}
+
 exports.getPlaceById = getPlaceById
-exports.getPlaceByUserId = getPlaceByUserId
+exports.getPlacesByUserId = getPlacesByUserId
 exports.createPlace = createPlace
 exports.updatePlace = updatePlace
+exports.deletePlace = deletePlace
