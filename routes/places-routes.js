@@ -1,35 +1,35 @@
 const express = require('express')
 const router = express.Router()
-const {check}=require('express-validator')
+const { check } = require('express-validator')
 
-const placesController=require('../controllers/places-controllers')
+const placesController = require('../controllers/places-controllers')
 
-router.get('/:pid',placesController.getPlaceById)
+router.get('/:pid', placesController.getPlaceById)
 
-router.get('/user/:uid',placesController.getPlacesByUserId)
+router.get('/user/:uid', placesController.getPlacesByUserId)
 
-router.post('/',[
+router.post('/', [
     check('name').not().isEmpty(),
     check('description').not().isEmpty()
-    .isLength({min:5}).withMessage("description must be at least 5 characters long")
-    .isLength({max:100}).withMessage("description must not contain more than 100 characters")
+        .isLength({ min: 5 }).withMessage("description must be at least 5 characters long")
+        .isLength({ max: 100 }).withMessage("description must not contain more than 100 characters")
     ,
     check('address').not().isEmpty(),
     check('url').not().isEmpty()
-],placesController.createPlace)
+], placesController.createPlace)
 
 router.patch('/:pid',
-[
-    check('name').not().isEmpty(),
-    check('description').not().isEmpty()
-    .isLength({min:5}).withMessage("description must be at least 5 characters long")
-    .isLength({max:100}).withMessage("description must not contain more than 100 characters")
-    ,
-    check('address').not().isEmpty(),
-    check('url').not().isEmpty()
-],
-placesController.updatePlace)
+    [
+        check('name').not().isEmpty(),
+        check('description').not().isEmpty()
+            .isLength({ min: 5 }).withMessage("description must be at least 5 characters long")
+            .isLength({ max: 100 }).withMessage("description must not contain more than 100 characters")
+        ,
+        check('address').not().isEmpty(),
+        check('url').not().isEmpty()
+    ],
+    placesController.updatePlace)
 
-router.delete('/:pid',placesController.deletePlace)
+router.delete('/:pid', placesController.deletePlace)
 
 module.exports = router

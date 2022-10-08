@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const {validationResult} = require('express-validator');
+const { validationResult } = require('express-validator');
 const HttpError = require('../models/http-error')
 
 let dummyPlace = [
@@ -32,32 +32,32 @@ const getPlacesByUserId = (req, res, next) => {
 }
 
 const createPlace = (req, res, next) => {
-    const Result=validationResult(req)
-    if(!Result.isEmpty()){
-       return next(new HttpError(Result.errors.map(err=>err.msg),422)) 
+    const Result = validationResult(req)
+    if (!Result.isEmpty()) {
+        return next(new HttpError(Result.errors.map(err => err.msg), 422))
     }
-    const date=new Date() 
-    const day =date.getDate()
-    const month =date.getMonth()+1
-    const year =date.getFullYear()
+    const date = new Date()
+    const day = date.getDate()
+    const month = date.getMonth() + 1
+    const year = date.getFullYear()
     console.log()
     const { name, description, address, url, location, creatorID } = req.body
-    const createdPlace = { id:uuidv4(), name, description, address, url, liked:false, n_likes:0, location, creatorID, postDate:`${day}-${month}-${year}` }
+    const createdPlace = { id: uuidv4(), name, description, address, url, liked: false, n_likes: 0, location, creatorID, postDate: `${day}-${month}-${year}` }
     dummyPlace.push(createdPlace)
     res.status(201).json(dummyPlace)
 }
 
 const updatePlace = (req, res, next) => {
-    const Result=validationResult(req)
-    if(!Result.isEmpty()){
-       return next(new HttpError(Result.errors.map(err=>err.msg),422)) 
+    const Result = validationResult(req)
+    if (!Result.isEmpty()) {
+        return next(new HttpError(Result.errors.map(err => err.msg), 422))
     }
     const { pid } = req.params;
     const { name, description, address, url, location } = req.body
     const updatedPlace = { name, description, address, url, location }
     dummyPlace = dummyPlace.map(p => {
         if (p.id === pid) {
-            return { ...p, ...updatedPlace }
+            return { ...p, ...updatedPlace }//as we need this place with key value pairs that are updated and also with key value pairs that are not updated
         } else {
             return p
         }
@@ -65,14 +65,14 @@ const updatePlace = (req, res, next) => {
     res.status(200).json({ place: updatedPlace, dummyPlace: dummyPlace })
 }
 
-const deletePlace= (req, res, next) => {
-    const {pid} =req.params
-    const foundPlace =dummyPlace.find(p => p.id === pid)
-    if(!foundPlace){
-        return next(new HttpError("Could not find place the place with id provided",404))
+const deletePlace = (req, res, next) => {
+    const { pid } = req.params
+    const foundPlace = dummyPlace.find(p => p.id === pid)
+    if (!foundPlace) {
+        return next(new HttpError("Could not find place the place with id provided", 404))
     }
-    dummyPlace=dummyPlace.filter(p => p.id !== pid)
-    res.status(200).json({message:"places Deleted"})
+    dummyPlace = dummyPlace.filter(p => p.id !== pid)
+    res.status(200).json({ message: "places Deleted" })
 }
 
 exports.getPlaceById = getPlaceById
