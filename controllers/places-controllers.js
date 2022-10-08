@@ -34,7 +34,7 @@ const getPlacesByUserId = (req, res, next) => {
 const createPlace = (req, res, next) => {
     const Result=validationResult(req)
     if(!Result.isEmpty()){
-        return next(new HttpError(Result.errors[0].msg,422))
+       return next(new HttpError(Result.errors.map(err=>err.msg),422)) 
     }
     const date=new Date() 
     const day =date.getDate()
@@ -48,6 +48,10 @@ const createPlace = (req, res, next) => {
 }
 
 const updatePlace = (req, res, next) => {
+    const Result=validationResult(req)
+    if(!Result.isEmpty()){
+       return next(new HttpError(Result.errors.map(err=>err.msg),422)) 
+    }
     const { pid } = req.params;
     const { name, description, address, url, location } = req.body
     const updatedPlace = { name, description, address, url, location }
