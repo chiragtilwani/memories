@@ -16,7 +16,7 @@ const getPlaceById = (req, res, next) => {
     const foundPlace = dummyPlace.find(p => p.id === pid);
     //triggering error handling middleware using Error Model-HttpError()
     if (!foundPlace) {
-        return next(new HttpError('Could not find the place with provided pid.', 404))
+        return next(new HttpError('Could not find the place with provided pid.', 404))//404-not found
     }
     res.json(foundPlace)
 }

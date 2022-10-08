@@ -10,6 +10,10 @@ const getUsers = (req, res, next) => {
 
 const signupUser = (req, res, next) => {
     const { name, email, bio, url, coverURL,password } = req.body
+    const foundUser=dummyUsers.find(user => user.email === email)
+    if(foundUser){
+        return next(new HttpError("Could not signup,email already exist!",422))//422-invalid user i/p
+    }
     const newUser = { id: uuidv4(), name, email, posts: 0, url, coverURL, bio,password }
     dummyUsers.push(newUser)
 
@@ -20,7 +24,7 @@ const loginUser = (req, res, next) => {
     const {email, password} = req.body
     const userFound=dummyUsers.find(user => user.email === email)
     if(!userFound || userFound.password !== password) {
-        return next (new HttpError('Could not identify user,credentials seems to be wrong!',401))
+        return next (new HttpError('Could not identify user,credentials seems to be wrong!',401))//401-authentication failed
     }
     res.json({message:"logged in successfully"})
 }
