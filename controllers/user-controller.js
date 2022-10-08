@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const {validationResult}=require('express-validator');
 
 const HttpError= require('../models/http-error')
 
@@ -9,6 +10,10 @@ const getUsers = (req, res, next) => {
 }
 
 const signupUser = (req, res, next) => {
+    const Result=validationResult(req)
+    if(!Result.isEmpty()){
+        return next(new HttpError(Result.errors.map(err => err.msg,422)))
+    }
     const { name, email, bio, url, coverURL,password } = req.body
     const foundUser=dummyUsers.find(user => user.email === email)
     if(foundUser){
