@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-
+const {validationResult} = require('express-validator');
 const HttpError = require('../models/http-error')
 
 let dummyPlace = [
@@ -32,6 +32,10 @@ const getPlacesByUserId = (req, res, next) => {
 }
 
 const createPlace = (req, res, next) => {
+    const Result=validationResult(req)
+    if(!Result.isEmpty()){
+        return next(new HttpError(Result.errors[0].msg,422))
+    }
     const date=new Date() 
     const day =date.getDate()
     const month =date.getMonth()+1
