@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const placeSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    description: { type: String, required: true, minLength: 5, maxLength: 100 },
+    description: { type: String, required: true, minLength: 5},
     address: { type: String, required: true },
     url: { type: String, required: true },
     likes: [],//arrays of user ids
