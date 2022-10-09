@@ -1,6 +1,10 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config();
+
 const HttpError = require('./models/http-error')
 const placesRouter = require('./routes/places-routes')
 const usersRouter = require('./routes/users-routes')
@@ -27,5 +31,6 @@ app.use((error, req, res, next) => {
     res.status(error.code || 500).json({ message: error.message || "An unknown error occurred" })
 })
 
-
-app.listen(5000);
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(
+    console.log(`Listening on port ${process.env.PORT}`)
+).catch((err) => console.log(err))
