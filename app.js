@@ -31,6 +31,6 @@ app.use((error, req, res, next) => {
     res.status(error.code || 500).json({ message: error.message || "An unknown error occurred" })
 })
 
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(
-    console.log(`Listening on port ${process.env.PORT}`)
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(()=>
+    app.listen(process.env.PORT)
 ).catch((err) => console.log(err))
