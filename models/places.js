@@ -6,7 +6,7 @@ const placeSchema = new mongoose.Schema({
     address: { type: String, required: true },
     url: { type: String, required: true },
     likes: [],//arrays of user ids
-    creatorID: { type: String },//creatorID add by us while creating new place
+    creatorID: { type: mongoose.Types.ObjectId, required: true,ref:'User'},//creatorID add by us while creating new place
     postDate: String
 })
 

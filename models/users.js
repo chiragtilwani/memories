@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
         required: 'Email address is required',
         validate: [ isEmail, 'invalid email' ]
     },
-    posts:[],//post ids
+    posts:[{type: mongoose.Types.ObjectId, required: true,ref:'Place'}],//post ids
     url:{ type: String},
     coverURL:{ type: String},
     bio:{ type: String, required: true,minLength:5, maxLength:100},
