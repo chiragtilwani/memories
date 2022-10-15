@@ -13,6 +13,15 @@ const usersRouter = require('./routes/users-routes')
 // app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
 
+//adding headers to all responses
+app.use((req,res,next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Headers', 'Origin,X-Requested-with,Content-Type,Accept,Authorization')
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE')
+
+    next()
+})
+
 //for sending request to routes starting with /api/places/... 
 app.use('/api/places', placesRouter)
 app.use('/api/users', usersRouter)
@@ -31,6 +40,6 @@ app.use((error, req, res, next) => {
     res.status(error.code || 500).json({ message: error.message || "An unknown error occurred" })
 })
 
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(()=>
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() =>
     app.listen(process.env.PORT)
 ).catch((err) => console.log(err))
