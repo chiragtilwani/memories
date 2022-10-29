@@ -6,8 +6,6 @@ const placesController = require('../controllers/places-controllers')
 
 router.get('/:pid', placesController.getPlaceById)
 
-router.get('/user/:uid', placesController.getPlacesByUserId)
-
 router.post('/', [
     check('name').not().isEmpty(),
     check('description').not().isEmpty()

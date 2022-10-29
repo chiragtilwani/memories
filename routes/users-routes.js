@@ -5,6 +5,7 @@ const router = express.Router()
 const usersController = require('../controllers/user-controller')
 
 router.get('/', usersController.getUsers)
+router.get('/user/:uid', usersController.getUserById)
 router.post('/login', usersController.loginUser)
 router.post('/signup', [
     check('name').not().isEmpty().withMessage('Name field is required'),

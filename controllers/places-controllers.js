@@ -21,25 +21,11 @@ const getPlaceById = async (req, res, next) => {
     res.json({ place: foundPlace })
 }
 
-const getPlacesByUserId = async (req, res, next) => {
-    const { uid } = req.params;
-    let foundPlaces;
-    try {
-        foundPlaces = await Place.find({ creatorID: uid });
-    } catch (err) {
-        return next(new HttpError('Something went wrong.Try again.', 500))
-    }
-    //triggering error handling middleware using Error Model-HttpError()
-    if (!foundPlaces || foundPlaces.length === 0) {
-        return next(new HttpError('Could not find the places with provided pid.', 404))
-    }
-    res.json(foundPlaces)
-}
 
 const createPlace = async (req, res, next) => {
     const Result = validationResult(req)
     if (!Result.isEmpty()) {
-        return next(new HttpError(Result.errors.map(err => err.msg), 422))
+        return next(new HttpError(Result.errors[0].msg, 422))
     }
     const date = new Date()
     const day = date.getDate()
@@ -82,7 +68,7 @@ const createPlace = async (req, res, next) => {
 const updatePlace = async (req, res, next) => {
     const Result = validationResult(req)
     if (!Result.isEmpty()) {
-        return next(new HttpError(Result.errors.map(err => err.msg), 422))
+        return next(new HttpError(Result.errors[0].msg, 422))
     }
     const { pid } = req.params;
     const { name, description, address, url } = req.body
@@ -120,7 +106,6 @@ const deletePlace = async (req, res, next) => {
 }
 
 exports.getPlaceById = getPlaceById
-exports.getPlacesByUserId = getPlacesByUserId
 exports.createPlace = createPlace
 exports.updatePlace = updatePlace
 exports.deletePlace = deletePlace

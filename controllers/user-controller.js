@@ -13,9 +13,24 @@ const getUsers = async (req, res, next) => {
     res.status(200).json({users:foundUsers})
 }
 
+const getUserById = async (req, res, next) => {
+    const { uid } = req.params;
+    let foundUser;
+    try {
+        foundUser = await User.findById(uid);
+    } catch (err) {
+        return next(new HttpError('Something went wrong.Try again.', 500))
+    }
+    //triggering error handling middleware using Error Model-HttpError()
+    if(!foundUser){
+        return next(new HttpError('Could not find the user with this id.', 404))
+    }
+    res.json(foundUser)
+}
+
+
 const signupUser = async (req, res, next) => {
     const Result = validationResult(req)
-    console.log(Result)
     if (!Result.isEmpty()) {
         return next(new HttpError(Result.errors[0].msg, 422))
     }
@@ -50,10 +65,11 @@ const loginUser = async (req, res, next) => {
     if (!userFound || userFound.password !== password) {
         return next(new HttpError('Could not identify user,credentials seems to be wrong!', 401))//401-authentication failed
     }
-    res.json({ message: "logged in successfully" })
+    res.json({userFound, message: "logged in successfully" })
 }
 
 
 exports.getUsers = getUsers
+exports.getUserById = getUserById
 exports.loginUser = loginUser
 exports.signupUser = signupUser
