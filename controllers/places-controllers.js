@@ -6,6 +6,16 @@ const Place = require('../models/places')
 const User = require('../models/users')
 
 
+const getAllPlaces = async(req,res,next) =>{
+    let foundPlaces;
+    try {
+        foundPlaces = await Place.find({})
+    }catch(e){
+        return next(new HttpError("Something went wrong",500))
+    }
+    res.status(200).json({places: foundPlaces})
+}
+
 const getPlaceById = async (req, res, next) => {
     const { pid } = req.params;
     let foundPlace;
@@ -105,6 +115,7 @@ const deletePlace = async (req, res, next) => {
     res.status(200).json({ message: "places Deleted" })
 }
 
+exports.getAllPlaces = getAllPlaces
 exports.getPlaceById = getPlaceById
 exports.createPlace = createPlace
 exports.updatePlace = updatePlace
