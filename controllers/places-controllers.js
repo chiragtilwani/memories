@@ -31,6 +31,22 @@ const getPlaceById = async (req, res, next) => {
     res.json({ place: foundPlace })
 }
 
+const getPlaceByUserId = async (req, res, next) => {
+    const { uid } = req.params;
+    let foundPlaces;
+    try {
+        foundPlaces = await Place.find({creatorID:uid});
+    } catch (err) {
+        return next(new HttpError("Something went wrong,Could not find place", 500))
+    }
+    //triggering error handling middleware using Error Model-HttpError()
+    if (!foundPlaces) {
+        return next(new HttpError('Could not find the places with provided user id.', 404))//404-not found
+    }
+    res.json({ places: foundPlaces })
+    
+}
+
 
 const createPlace = async (req, res, next) => {
     const Result = validationResult(req)
@@ -117,6 +133,7 @@ const deletePlace = async (req, res, next) => {
 
 exports.getAllPlaces = getAllPlaces
 exports.getPlaceById = getPlaceById
+exports.getPlaceByUserId = getPlaceByUserId
 exports.createPlace = createPlace
 exports.updatePlace = updatePlace
 exports.deletePlace = deletePlace

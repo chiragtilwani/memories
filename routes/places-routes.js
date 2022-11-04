@@ -8,6 +8,8 @@ router.get('/',placesController.getAllPlaces)
 
 router.get('/:pid', placesController.getPlaceById)
 
+router.get('/user/:uid', placesController.getPlaceByUserId)
+
 router.post('/', [
     check('name').not().isEmpty(),
     check('description').not().isEmpty()
