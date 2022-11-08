@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const HttpError = require('../models/http-error')
 const Place = require('../models/places')
 const User = require('../models/users')
+const cloudinary=require('../middleware/cloudinary')
 
 
 const getAllPlaces = async(req,res,next) =>{
@@ -58,12 +59,23 @@ const createPlace = async (req, res, next) => {
     const month = date.getMonth() + 1
     const year = date.getFullYear()
     const { name, description, address, url, creatorID } = req.body
+    let result;
+    try{
+        result = await cloudinary.uploader.upload(url,{
+            folder:"memories",
+        })
+    }catch(err){
+        return next(new HttpError("Could not upload your memory image",500))
+    }
     const createdPlace = new Place({
         name,
         description,
         address,
-        url,
-        creatorID,//creatorID add by us while creating new place
+        url:{
+            public_id:result.public_id,
+            url:result.secure_url
+        },
+        creatorID,//creatorID will be added by us while creating new place
         postDate: `${day}-${month}-${year}`
     })
 
@@ -100,7 +112,13 @@ const updatePlace = async (req, res, next) => {
     const { name, description, address, url } = req.body
     let result;
     try {
-        result = await Place.findOneAndUpdate({ _id: pid }, { name, description, address, url })
+        const imgResult = await cloudinary.uploader.upload(url,{
+            folder:'memories'
+        })
+        result = await Place.findOneAndUpdate({ _id: pid }, { name, description, address, url:{
+            public_id:imgResult.public_id,
+            url:imgResult.secure_url
+        } })
     } catch (err) {
         return next(new HttpError("Something went wrong", 500))
     }

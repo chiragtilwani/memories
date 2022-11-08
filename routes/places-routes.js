@@ -14,7 +14,6 @@ router.post('/', [
     check('name').not().isEmpty(),
     check('description').not().isEmpty()
         .isLength({ min: 5 }).withMessage("description must be at least 5 characters long")
-        .isLength({ max: 100 }).withMessage("description must not contain more than 100 characters")
     ,
     check('address').not().isEmpty(),
     check('url').not().isEmpty()

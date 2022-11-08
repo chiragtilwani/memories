@@ -13,10 +13,15 @@ const userSchema = new mongoose.Schema({
     },
     posts: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Place' }],//post ids
     url: {
-        type: String,
-        default: ""
+        public_id:{
+            type: String,
+            
+        },
+        url:{
+            type: String,
+            
+        }
     },
-    coverURL: { type: String, default: "" },
     bio: {
         type: String,
         required: "This field is required",
