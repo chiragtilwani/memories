@@ -1,4 +1,6 @@
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const HttpError = require('../models/http-error')
 const User = require('../models/users')
@@ -55,10 +57,10 @@ const getUserByIdAndUpdate = async (req, res, next) => {
             } catch (err) {
                 return next(new HttpError(err, 500))
             }
-        }else{
-            try{
-                result=await User.updateOne({_id: foundUser._id},req.body)
-            }catch(err){
+        } else {
+            try {
+                result = await User.updateOne({ _id: foundUser._id }, req.body)
+            } catch (err) {
                 return next(new HttpError(err, 500))
             }
         }
@@ -73,7 +75,6 @@ const signupUser = async (req, res, next) => {
         return next(new HttpError(Result.errors[0].msg, 422))
     }
     const { name, email, bio, password } = req.body
-    console.log(req.body)
     let foundUser;
     try {
         foundUser = await User.findOne({ email: email })
@@ -84,17 +85,34 @@ const signupUser = async (req, res, next) => {
     if (foundUser) {
         return next(new HttpError("Could not signup,email already exist!", 422))//422-invalid user i/p
     }
-    const newUser = new User({ name, email, posts: [], bio, password,url:{
-        public_id: '',
-        url:''
-    } })
+
+    let hashedPassword;
+    try {
+        hashedPassword = await bcrypt.hash(password, 12)
+    }catch(err){
+        return next(new HttpError("Something went wrong", 500))
+    }
+
+    const newUser = new User({
+        name, email, posts: [], bio, password:hashedPassword, url: {
+            public_id: '',
+            url: ''
+        }
+    })
     try {
         await newUser.save()
     } catch (err) {
-        return next(new HttpError(err, 500))
+        return next(new HttpError('Something went wrong.Try again.', 500))
     }
 
-    res.status(200).json(newUser)
+    let token;
+    try{
+        token=jwt.sign({userId: newUser._id,email: newUser.email},process.env.SECRET_KEY,{expiresIn:'1h'})
+    }catch(err){
+        return next(new HttpError('Something went wrong.Try again.',500))
+    }
+
+    res.status(200).json({userId: newUser._id,email: newUser.email,token:token})
 }
 
 const loginUser = async (req, res, next) => {
@@ -105,10 +123,29 @@ const loginUser = async (req, res, next) => {
     } catch (e) {
         return next(new HttpError("Something went wrong", 500))
     }
-    if (!userFound || userFound.password !== password) {
-        return next(new HttpError('Could not identify user,credentials seems to be wrong!', 401))//401-authentication failed
+    if (!userFound) {
+        return next(new HttpError('Could not login user,credentials seems to be wrong!', 401))//401-authentication failed
     }
-    res.json({ userFound, message: "logged in successfully" })
+
+    let isValidPassword =false;
+    try{
+        isValidPassword = await bcrypt.compare(password,userFound.password)
+    }catch(err){
+        return next(new HttpError('Could not login user,credentials seems to be wrong!', 500))
+    }
+
+    if(!isValidPassword){
+        return next(new HttpError('Could not login user,credentials seems to be wrong!',401))
+    }
+
+    let token;
+    try{
+        token=jwt.sign({userId:userFound.id,email:userFound.email},process.env.SECRET_KEY,{expiresIn:'1h'})
+    }catch(err){
+        return next(new HttpError('Something went wrong.Try again.',500))
+    }
+
+    res.json({userId:userFound.id,email:userFound.email,token:token })
 }
 
 

@@ -4,17 +4,17 @@ const mongoose = require('mongoose')
 const HttpError = require('../models/http-error')
 const Place = require('../models/places')
 const User = require('../models/users')
-const cloudinary=require('../middleware/cloudinary')
+const cloudinary = require('../middleware/cloudinary')
 
 
-const getAllPlaces = async(req,res,next) =>{
+const getAllPlaces = async (req, res, next) => {
     let foundPlaces;
     try {
         foundPlaces = await Place.find({})
-    }catch(e){
-        return next(new HttpError("Something went wrong",500))
+    } catch (e) {
+        return next(new HttpError("Something went wrong", 500))
     }
-    res.status(200).json({places: foundPlaces})
+    res.status(200).json({ places: foundPlaces })
 }
 
 const getPlaceById = async (req, res, next) => {
@@ -36,7 +36,7 @@ const getPlaceByUserId = async (req, res, next) => {
     const { uid } = req.params;
     let foundPlaces;
     try {
-        foundPlaces = await Place.find({creatorID:uid});
+        foundPlaces = await Place.find({ creatorID: uid });
     } catch (err) {
         return next(new HttpError("Something went wrong,Could not find place", 500))
     }
@@ -45,7 +45,7 @@ const getPlaceByUserId = async (req, res, next) => {
         return next(new HttpError('Could not find the places with provided user id.', 404))//404-not found
     }
     res.json({ places: foundPlaces })
-    
+
 }
 
 
@@ -60,20 +60,20 @@ const createPlace = async (req, res, next) => {
     const year = date.getFullYear()
     const { name, description, address, url, creatorID } = req.body
     let result;
-    try{
-        result = await cloudinary.uploader.upload(url,{
-            folder:"memories",
+    try {
+        result = await cloudinary.uploader.upload(url, {
+            folder: "memories",
         })
-    }catch(err){
-        return next(new HttpError("Could not upload your memory image",500))
+    } catch (err) {
+        return next(new HttpError("Could not upload your memory image", 500))
     }
     const createdPlace = new Place({
         name,
         description,
         address,
-        url:{
-            public_id:result.public_id,
-            url:result.secure_url
+        url: {
+            public_id: result.public_id,
+            url: result.secure_url
         },
         creatorID,//creatorID will be added by us while creating new place
         postDate: `${day}-${month}-${year}`
@@ -110,19 +110,32 @@ const updatePlace = async (req, res, next) => {
     }
     const { pid } = req.params;
     const { name, description, address, url } = req.body
-    let result;
+    let foundPlace;
     try {
-        const imgResult = await cloudinary.uploader.upload(url,{
-            folder:'memories'
-        })
-        result = await Place.findOneAndUpdate({ _id: pid }, { name, description, address, url:{
-            public_id:imgResult.public_id,
-            url:imgResult.secure_url
-        } })
+        foundPlace = await Place.findById(pid)
     } catch (err) {
         return next(new HttpError("Something went wrong", 500))
     }
-    res.status(200).json(result)
+
+    if (foundPlace.creatorID.toString() !== req.userData.userId) {
+        return next(new HttpError("Your are not allowed to perform this action", 401))
+    }
+
+    try {
+        const imgResult = await cloudinary.uploader.upload(url, {
+            folder: 'memories'
+        })
+        foundPlace = await Place.findOneAndUpdate({ _id: pid }, {
+            name, description, address, url: {
+                public_id: imgResult.public_id,
+                url: imgResult.secure_url
+            }
+        })
+    } catch (err) {
+        return next(new HttpError("Something went wrong", 500))
+    }
+
+    res.status(200).json(foundPlace)
 }
 
 const deletePlace = async (req, res, next) => {
@@ -136,6 +149,11 @@ const deletePlace = async (req, res, next) => {
     if (!foundPlace) {
         return next(new HttpError("Could not find place the place with id provided", 404))
     }
+
+    if(foundPlace.creatorID._id.toString() !== req.userData.userId){
+        return next(new HttpError("Your are not allowed to perform this action",401))
+    }
+
     try {
         const sess = await mongoose.startSession()
         sess.startTransaction()
