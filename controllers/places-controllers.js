@@ -125,6 +125,10 @@ const updatePlace = async (req, res, next) => {
         const imgResult = await cloudinary.uploader.upload(url, {
             folder: 'memories'
         })
+
+        const imgId = foundPlace.url.public_id
+        await cloudinary.uploader.destroy(imgId)
+
         foundPlace = await Place.findOneAndUpdate({ _id: pid }, {
             name, description, address, url: {
                 public_id: imgResult.public_id,
@@ -150,11 +154,15 @@ const deletePlace = async (req, res, next) => {
         return next(new HttpError("Could not find place the place with id provided", 404))
     }
 
-    if(foundPlace.creatorID._id.toString() !== req.userData.userId){
-        return next(new HttpError("Your are not allowed to perform this action",401))
+    if (foundPlace.creatorID._id.toString() !== req.userData.userId) {
+        return next(new HttpError("Your are not allowed to perform this action", 401))
     }
 
     try {
+        //deleting image of product from cloudinary
+        const imgId = foundPlace.url.public_id
+        await cloudinary.uploader.destroy(imgId)
+
         const sess = await mongoose.startSession()
         sess.startTransaction()
         await foundPlace.remove({ session: sess })

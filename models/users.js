@@ -13,13 +13,13 @@ const userSchema = new mongoose.Schema({
     },
     posts: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Place' }],//post ids
     url: {
-        public_id:{
+        public_id: {
             type: String,
-            
+
         },
-        url:{
+        url: {
             type: String,
-            
+
         }
     },
     bio: {

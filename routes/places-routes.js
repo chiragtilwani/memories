@@ -3,10 +3,10 @@ const router = express.Router()
 const { check } = require('express-validator')
 
 const placesController = require('../controllers/places-controllers')
-const AuthMiddleware=require('../middleware/auth-middleware')
+const AuthMiddleware = require('../middleware/auth-middleware')
 
 
-router.get('/',placesController.getAllPlaces)
+router.get('/', placesController.getAllPlaces)
 
 router.get('/:pid', placesController.getPlaceById)
 
