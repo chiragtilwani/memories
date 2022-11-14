@@ -9,8 +9,6 @@ const HttpError = require('./models/http-error')
 const placesRouter = require('./routes/places-routes')
 const usersRouter = require('./routes/users-routes')
 
-//for parsing encoded data like data of form
-// app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
 
 //adding headers to all responses

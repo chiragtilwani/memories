@@ -44,7 +44,6 @@ const getUserByIdAndUpdate = async (req, res, next) => {
     } else {
         if (req.body.url) {
             try {
-                console.log(req.body.url)
                 ImgResult = await cloudinary.uploader.upload(req.body.url, { folder: 'memories' })
                 result = await User.updateOne({ _id: foundUser._id },
                     {
@@ -78,7 +77,6 @@ const signupUser = async (req, res, next) => {
     let foundUser;
     try {
         foundUser = await User.findOne({ email: email })
-        console.log(foundUser)
     } catch (err) {
         return next(new HttpError("Something went wrong", 500))
     }
