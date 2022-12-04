@@ -7,7 +7,9 @@ dotenv.config();
 const cors=require('cors');
 
 app.use(cors({
-    origin:'https://memories-chirag.netlify.app',
+    origin: '*',
+     credentials: true,
+     optionSuccessStatus: 200
 }))
 
 const HttpError = require('./models/http-error')
