@@ -4,6 +4,11 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config();
+const cors=require('cors');
+
+app.use(cors({
+    origin:'https://memories-chirag.netlify.app',
+}))
 
 const HttpError = require('./models/http-error')
 const placesRouter = require('./routes/places-routes')
@@ -19,6 +24,7 @@ app.use((req, res, next) => {
 
     next()
 })
+
 
 //for sending request to routes starting with /api/places/... 
 app.use('/api/places', placesRouter)
@@ -37,7 +43,7 @@ app.use((error, req, res, next) => {
     }
     res.status(error.code || 500).json({ message: error.message || "An unknown error occurred" })
 })
-
+// console.log(process.env.MONGODB_URI)
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() =>
     app.listen(process.env.PORT || 5000)
 ).catch((err) => console.log(err))
